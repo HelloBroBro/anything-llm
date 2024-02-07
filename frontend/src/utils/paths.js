@@ -55,6 +55,9 @@ export default {
     chat: (slug) => {
       return `/workspace/${slug}`;
     },
+    additionalSettings: (slug) => {
+      return `/workspace/${slug}/settings`;
+    },
   },
   apiDocs: () => {
     return `${API_BASE}/docs`;
@@ -92,6 +95,9 @@ export default {
     },
     apiKeys: () => {
       return "/settings/api-keys";
+    },
+    logs: () => {
+      return "/settings/event-logs";
     },
     embedSetup: () => {
       return `/settings/embed-config`;
