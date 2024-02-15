@@ -1,6 +1,6 @@
 import useGetProviderModels, {
   DISABLED_PROVIDERS,
-} from "./useGetProviderModels";
+} from "@/hooks/useGetProvidersModels";
 
 export default function ChatModelSelection({
   settings,
