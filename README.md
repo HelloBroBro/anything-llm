@@ -73,6 +73,7 @@ Some cool features of AnythingLLM
 - [LocalAi (all models)](https://localai.io/)
 - [Together AI (chat models)](https://www.together.ai/)
 - [Perplexity (chat models)](https://www.perplexity.ai/)
+- [OpenRouter (chat models)](https://openrouter.ai/)
 - [Mistral](https://mistral.ai/)
 
 **Supported Embedding models:**
