@@ -180,7 +180,6 @@ export default function LLMPreference({
       showToast(`Failed to save LLM settings: ${error}`, "error");
       return;
     }
-    showToast("LLM settings saved successfully.", "success", { clear: true });
     navigate(paths.onboarding.embeddingPreference());
   };
 
@@ -211,7 +210,7 @@ export default function LLMPreference({
               <input
                 type="text"
                 placeholder="Search LLM providers"
-                className="bg-zinc-600 z-20 pl-10 rounded-full w-full px-4 py-1 text-sm border-2 border-slate-300/40 outline-none focus:border-white text-white"
+                className="bg-zinc-600 z-20 pl-10 h-[38px] rounded-full w-full px-4 py-1 text-sm border-2 border-slate-300/40 outline-none focus:border-white text-white"
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoComplete="off"
                 onKeyDown={(e) => {
