@@ -26,6 +26,10 @@
 </p>
 
 <p align="center">
+  <b>English</b> · <a href='/README.zh-CN.md'>简体中文</a>
+</p>
+
+<p align="center">
 👉 AnythingLLM for desktop (Mac, Windows, & Linux)! <a href="https://useanything.com/download" target="_blank"> Download Now</a>
 </p>
 
@@ -81,7 +85,7 @@ Some cool features of AnythingLLM
 - [Groq](https://groq.com/)
 - [Cohere](https://cohere.com/)
 - [KoboldCPP](https://github.com/LostRuins/koboldcpp)
-
+- [Text Generation Web UI](https://github.com/oobabooga/text-generation-webui)
 
 **Supported Embedding models:**
 
@@ -93,12 +97,10 @@ Some cool features of AnythingLLM
 - [LM Studio (all)](https://lmstudio.ai)
 - [Cohere](https://cohere.com/)
 
-
 **Supported Transcription models:**
 
 - [AnythingLLM Built-in](https://github.com/Mintplex-Labs/anything-llm/tree/master/server/storage/models#audiovideo-transcription) (default)
 - [OpenAI](https://openai.com/)
-
 
 **Supported Vector Databases:**
 
@@ -110,7 +112,6 @@ Some cool features of AnythingLLM
 - [QDrant](https://qdrant.tech)
 - [Milvus](https://milvus.io)
 - [Zilliz](https://zilliz.com)
-
 
 ### Technical Overview
 
@@ -151,7 +152,6 @@ Mintplex Labs & the community maintain a number of deployment methods, scripts, 
 - create issue
 - create PR with branch name format of `<issue number>-<short name>`
 - yee haw let's merge
-
 
 ## Telemetry & Privacy
 
