@@ -1,7 +1,7 @@
 process.env.NODE_ENV === "development"
   ? require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` })
   : require("dotenv").config();
-const { viewLocalFiles, normalizePath } = require("../utils/files");
+const { viewLocalFiles, normalizePath, isWithin } = require("../utils/files");
 const { purgeDocument, purgeFolder } = require("../utils/files/purgeDocument");
 const { getVectorDbClass } = require("../utils/helpers");
 const { updateENV, dumpENV } = require("../utils/helpers/updateENV");
@@ -436,14 +436,22 @@ function systemEndpoints(app) {
           return;
         }
 
+        let error = null;
         const { usePassword, newPassword } = reqBody(request);
-        const { error } = await updateENV(
-          {
-            AuthToken: usePassword ? newPassword : "",
-            JWTSecret: usePassword ? v4() : "",
-          },
-          true
-        );
+        if (!usePassword) {
+          // Password is being disabled so directly unset everything to bypass validation.
+          process.env.AUTH_TOKEN = "";
+          process.env.JWT_SECRET = "";
+        } else {
+          error = await updateENV(
+            {
+              AuthToken: newPassword,
+              JWTSecret: v4(),
+            },
+            true
+          )?.error;
+        }
+
         if (process.env.NODE_ENV === "production") await dumpENV();
         response.status(200).json({ success: !error, error });
       } catch (e) {
@@ -518,17 +526,24 @@ function systemEndpoints(app) {
       const defaultFilename = getDefaultFilename();
       const logoPath = await determineLogoFilepath(defaultFilename);
       const { found, buffer, size, mime } = fetchLogo(logoPath);
+
       if (!found) {
         response.sendStatus(204).end();
         return;
       }
 
+      const currentLogoFilename = await SystemSettings.currentLogoFilename();
       response.writeHead(200, {
+        "Access-Control-Expose-Headers":
+          "Content-Disposition,X-Is-Custom-Logo,Content-Type,Content-Length",
         "Content-Type": mime || "image/png",
         "Content-Disposition": `attachment; filename=${path.basename(
           logoPath
         )}`,
         "Content-Length": size,
+        "X-Is-Custom-Logo":
+          currentLogoFilename !== null &&
+          currentLogoFilename !== defaultFilename,
       });
       response.end(Buffer.from(buffer, "base64"));
       return;
@@ -561,6 +576,22 @@ function systemEndpoints(app) {
       response.status(200).json({ supportEmail: supportEmail });
     } catch (error) {
       console.error("Error fetching support email:", error);
+      response.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // No middleware protection in order to get this on the login page
+  app.get("/system/custom-app-name", async (_, response) => {
+    try {
+      const customAppName =
+        (
+          await SystemSettings.get({
+            label: "custom_app_name",
+          })
+        )?.value ?? null;
+      response.status(200).json({ customAppName: customAppName });
+    } catch (error) {
+      console.error("Error fetching custom app name:", error);
       response.status(500).json({ message: "Internal server error" });
     }
   });
@@ -614,11 +645,13 @@ function systemEndpoints(app) {
         const userRecord = await User.get({ id: user.id });
         const oldPfpFilename = userRecord.pfpFilename;
         if (oldPfpFilename) {
+          const storagePath = path.join(__dirname, "../storage/assets/pfp");
           const oldPfpPath = path.join(
-            __dirname,
-            `../storage/assets/pfp/${normalizePath(userRecord.pfpFilename)}`
+            storagePath,
+            normalizePath(userRecord.pfpFilename)
           );
-
+          if (!isWithin(path.resolve(storagePath), path.resolve(oldPfpPath)))
+            throw new Error("Invalid path name");
           if (fs.existsSync(oldPfpPath)) fs.unlinkSync(oldPfpPath);
         }
 
@@ -647,13 +680,14 @@ function systemEndpoints(app) {
         const userRecord = await User.get({ id: user.id });
         const oldPfpFilename = userRecord.pfpFilename;
 
-        console.log("oldPfpFilename", oldPfpFilename);
         if (oldPfpFilename) {
+          const storagePath = path.join(__dirname, "../storage/assets/pfp");
           const oldPfpPath = path.join(
-            __dirname,
-            `../storage/assets/pfp/${normalizePath(oldPfpFilename)}`
+            storagePath,
+            normalizePath(oldPfpFilename)
           );
-
+          if (!isWithin(path.resolve(storagePath), path.resolve(oldPfpPath)))
+            throw new Error("Invalid path name");
           if (fs.existsSync(oldPfpPath)) fs.unlinkSync(oldPfpPath);
         }
 
